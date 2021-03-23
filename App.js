@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-import {Icon, ListItem} from 'react-native-elements';
+import {Button, Icon, ListItem} from 'react-native-elements';
 
 import {Stopwatch} from 'react-native-stopwatch-timer';
+
+import firebase from './Firebase.js';
 
 const steps = [
   {name: 'Escaliers'},
@@ -36,6 +38,50 @@ class App extends Component {
     this.resetStopwatch = this.resetStopwatch.bind(this);
     this.getFormattedTime = this.getFormattedTime.bind(this);
     this.nextStep = this.nextStep.bind(this);
+  }
+
+  componentDidMount() {
+    (async () => {
+      console.log(
+        await firebase
+          .firestore()
+          .collection('users')
+          .doc('VU4mXV7kkkSdtZzz1Jji')
+          .get(),
+      );
+    })();
+  }
+
+  sendRun() {
+    return new Promise((resolve, reject) => {
+      try {
+        var payload = {
+          class: 'Cantine LLA',
+          run_info: {
+            epoch: new Date().getTime(),
+            runner: 'VU4mXV7kkkSdtZzz1Jji',
+          },
+          run: {},
+        };
+
+        this.state.times.forEach(time => {
+          payload.run[time.name] = time;
+        });
+      } catch (e) {
+        reject(e);
+      }
+
+      console.log(payload);
+
+      firebase
+        .firestore()
+        .collection('runs')
+        .add(payload)
+        .then(() => {
+          alert('Added :)');
+          resolve();
+        });
+    });
   }
 
   toggleStopwatch() {
@@ -81,6 +127,13 @@ class App extends Component {
       times[this.state.nextStep].time = this.currentTime;
       this.setState({times, nextStep: this.state.nextStep + 1});
     }
+
+    if (this.state.nextStep > this.state.times.length - 2) {
+      console.log('elo');
+      if (this.state.stopwatchStart) {
+        this.toggleStopwatch();
+      }
+    }
   }
 
   timeSinceLast(key, value) {
@@ -119,13 +172,14 @@ class App extends Component {
           }}
           getTime={this.getFormattedTime}
         />
-        <ListItem style={styles.buttonView}>
+        <ListItem style={styles.buttonView} key={'buttons'}>
           <Icon
             name={!this.state.stopwatchStart ? 'play' : 'pause'}
             type={'font-awesome'}
             onPress={this.toggleStopwatch}
             size={30}
             style={styles.icons}
+            key={'play'}
           />
           <Icon
             name={'stop'}
@@ -133,6 +187,7 @@ class App extends Component {
             onPress={this.resetStopwatch}
             size={30}
             style={styles.icons}
+            key={'stop'}
           />
           <Icon
             name={'check'}
@@ -140,6 +195,7 @@ class App extends Component {
             onPress={this.nextStep}
             size={30}
             style={styles.icons}
+            key={'next'}
           />
         </ListItem>
         <View style={styles.stepsContainer}>
@@ -157,6 +213,23 @@ class App extends Component {
             );
           }, this)}
         </View>
+        <View>
+          <Button
+            disabled={
+              this.state.times[this.state.times.length - 1].time === undefined
+            }
+            onPress={async () => {
+              await this.sendRun();
+            }}>
+            <Text>SEND RUN</Text>
+          </Button>
+        </View>
+        {/*<Button
+          onPress={async () => {
+            console.log(await firebase.firestore().collection('users').get());
+          }}>
+          <Text>Dump db :)</Text>
+        </Button>*/}
       </View>
     );
   }

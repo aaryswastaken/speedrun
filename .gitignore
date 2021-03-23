@@ -59,4 +59,5 @@ buck-out/
 /ios/Pods/
 
 # firebase
-/android/app/google-services.json
+android/app/google-services.json
+speedrun-cantine-firebase-adminsdk-57poo-d8b99ba1b7.json

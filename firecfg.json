@@ -1,0 +1,9 @@
+{
+  "apiKey": "AIzaSyApiWGpr7lQrbSDnSZ0G1JTdBwlt8jxB3A",
+  "authDomain": "speedrun-cantine.firebaseapp.com",
+  "projectId": "speedrun-cantine",
+  "storageBucket": "speedrun-cantine.appspot.com",
+  "messagingSenderId": "20096634620",
+  "appId": "1:20096634620:web:117823fab6d42a4c401179",
+  "databaseURL": "https://sppedrun-cantine.firebaseio.com"
+}
